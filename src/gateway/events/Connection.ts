@@ -17,6 +17,7 @@
 */
 
 /* eslint-disable @typescript-eslint/ban-ts-comment */
+import fs from "fs";
 import WS from "ws";
 import { genSessionId, WebSocket } from "@fosscord/gateway";
 import { Send } from "../util/Send";
@@ -82,7 +83,12 @@ export async function Connection(
 				socket.on(x, (y) => console.log(x, y));
 			});
 
-		const { searchParams } = new URL(`http://localhost${request.url}`);
+		const { searchParams } = new URL(
+			fs.readFileSync("./tmp/PROT", { encoding: "utf8" }) +
+				"://" +
+				fs.readFileSync("./tmp/HOST", { encoding: "utf8" }) +
+				request.url || `http://localhost:3001${request.url}`,
+		);
 		// @ts-ignore
 		socket.encoding = searchParams.get("encoding") || "json";
 		if (!["json", "etf"].includes(socket.encoding))

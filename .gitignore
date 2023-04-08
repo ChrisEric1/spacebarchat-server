@@ -17,5 +17,5 @@ build
 *.log
 *.log.ansi
 *.tmp
-tmp/
+#tmp/
 dump/

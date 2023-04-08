@@ -19,6 +19,7 @@
 import { closeDatabase, Config, initDatabase, initEvent } from "@fosscord/util";
 import dotenv from "dotenv";
 import http from "http";
+import MediaServer from "medooze-media-server";
 import ws from "ws";
 import { Connection } from "./events/Connection";
 dotenv.config();
@@ -48,18 +49,18 @@ export class Server {
 			});
 		}
 
-		// this.server.on("upgrade", (request, socket, head) => {
-		// 	if (!request.url?.includes("voice")) return;
-		// 	this.ws.handleUpgrade(request, socket, head, (socket) => {
-		// 		// @ts-ignore
-		// 		socket.server = this;
-		// 		this.ws.emit("connection", socket, request);
-		// 	});
-		// });
+		this.server.on("upgrade", (request, socket, head) => {
+			if (!request.url?.includes("voice")) return;
+			this.ws.handleUpgrade(request, socket, head, (socket) => {
+				// @ts-ignore
+				socket.server = this;
+				this.ws.emit("connection", socket, request);
+			});
+		});
 
 		this.ws = new ws.Server({
 			maxPayload: 1024 * 1024 * 100,
-			server: this.server,
+			noServer: true,
 		});
 		this.ws.on("connection", Connection);
 		this.ws.on("error", console.error);
@@ -71,12 +72,13 @@ export class Server {
 		await initEvent();
 		if (!this.server.listening) {
 			this.server.listen(this.port);
-			console.log(`[WebRTC] online on 0.0.0.0:${this.port}`);
+			console.log(`[WebRTC] online on port ${this.port}`);
 		}
 	}
 
 	async stop() {
 		closeDatabase();
+		MediaServer.terminate();
 		this.server.close();
 	}
 }

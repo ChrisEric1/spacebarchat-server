@@ -16,6 +16,7 @@
 	along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+import fs from "fs";
 import { Config, Snowflake } from "@fosscord/util";
 import crypto from "crypto";
 import { Request, Response, Router } from "express";
@@ -59,7 +60,12 @@ router.post("/", multer.single("file"), async (req: Request, res: Response) => {
 	if (ANIMATED_MIME_TYPES.includes(type.mime)) hash = `a_${hash}`; // animated icons have a_ infront of the hash
 
 	const path = `guilds/${guild_id}/users/${user_id}/avatars/${hash}`;
-	const endpoint = Config.get().cdn.endpointPublic || "http://localhost:3001";
+	const endpoint =
+		Config.get().cdn.endpointPublic ||
+		fs.readFileSync("./tmp/PROT", { encoding: "utf8" }) +
+			"://" +
+			fs.readFileSync("./tmp/HOST", { encoding: "utf8" }) ||
+		"http://localhost:3001";
 
 	await storage.set(path, buffer);
 

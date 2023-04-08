@@ -16,6 +16,7 @@
 	along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+import fs from "fs";
 import { Payload, WebSocket } from "@fosscord/gateway";
 import { genVoiceToken } from "../util/SessionUtils";
 import { check } from "./instanceOf";
@@ -133,9 +134,13 @@ export async function onVoiceStateUpdate(this: WebSocket, data: Payload) {
 			data: {
 				token: voiceState.token,
 				guild_id: voiceState.guild_id,
-				endpoint: guildRegion.endpoint,
+				endpoint:
+					fs.readFileSync("./tmp/HOST", { encoding: "utf8" }) +
+						"/voice" ||
+					"localhost:3001/voice" ||
+					guildRegion.endpoint + "/voice",
 			},
-			guild_id: voiceState.guild_id,
+			user_id: this.user_id,
 		} as VoiceServerUpdateEvent);
 	}
 }

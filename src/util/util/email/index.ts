@@ -16,7 +16,8 @@
 	along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import fs from "node:fs";
+import fs from "fs";
+import nodefs from "node:fs";
 import path from "node:path";
 import { SentMessageInfo, Transporter } from "nodemailer";
 import { User } from "../../entities";
@@ -161,7 +162,11 @@ export const Email: {
 	generateLink: async function (type, id, email) {
 		const token = (await generateToken(id, email)) as string;
 		const instanceUrl =
-			Config.get().general.frontPage || "http://localhost:3001";
+			Config.get().general.frontPage ||
+			fs.readFileSync("./tmp/PROT", { encoding: "utf8" }) +
+				"://" +
+				fs.readFileSync("./tmp/HOST", { encoding: "utf8" }) ||
+			"http://localhost:3001";
 		const link = `${instanceUrl}/${type}#token=${token}`;
 		return link;
 	},
@@ -175,7 +180,7 @@ export const Email: {
 		const link = await this.generateLink("verify", user.id, email);
 
 		// load the email template
-		const rawTemplate = fs.readFileSync(
+		const rawTemplate = nodefs.readFileSync(
 			path.join(
 				ASSET_FOLDER_PATH,
 				"email_templates",
@@ -193,7 +198,10 @@ export const Email: {
 		// construct the email
 		const message = {
 			from:
-				Config.get().general.correspondenceEmail || "noreply@localhost",
+				Config.get().general.correspondenceEmail ||
+				"noreply@" +
+					fs.readFileSync("./tmp/HOST", { encoding: "utf8" }) ||
+				"noreply@localhost",
 			to: email,
 			subject,
 			html,
@@ -212,7 +220,7 @@ export const Email: {
 		const link = await this.generateLink("reset", user.id, email);
 
 		// load the email template
-		const rawTemplate = await fs.promises.readFile(
+		const rawTemplate = await nodefs.promises.readFile(
 			path.join(
 				ASSET_FOLDER_PATH,
 				"email_templates",
@@ -230,7 +238,10 @@ export const Email: {
 		// construct the email
 		const message = {
 			from:
-				Config.get().general.correspondenceEmail || "noreply@localhost",
+				Config.get().general.correspondenceEmail ||
+				"noreply@" +
+					fs.readFileSync("./tmp/HOST", { encoding: "utf8" }) ||
+				"noreply@localhost",
 			to: email,
 			subject,
 			html,
@@ -246,7 +257,7 @@ export const Email: {
 		if (!this.transporter) return;
 
 		// load the email template
-		const rawTemplate = await fs.promises.readFile(
+		const rawTemplate = await nodefs.promises.readFile(
 			path.join(
 				ASSET_FOLDER_PATH,
 				"email_templates",
@@ -264,7 +275,10 @@ export const Email: {
 		// construct the email
 		const message = {
 			from:
-				Config.get().general.correspondenceEmail || "noreply@localhost",
+				Config.get().general.correspondenceEmail ||
+				"noreply@" +
+					fs.readFileSync("./tmp/HOST", { encoding: "utf8" }) ||
+				"noreply@localhost",
 			to: email,
 			subject,
 			html,

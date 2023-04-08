@@ -16,6 +16,7 @@
 	along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+import fs from "fs";
 import FormData from "form-data";
 import { HTTPError } from "lambert-server";
 import fetch from "node-fetch";
@@ -36,7 +37,12 @@ export async function uploadFile(
 	});
 
 	const response = await fetch(
-		`${Config.get().cdn.endpointPrivate || "http://localhost:3001"}${path}`,
+		fs.readFileSync("./tmp/PROT", { encoding: "utf8" }) +
+			"://" +
+			fs.readFileSync("./tmp/HOST", { encoding: "utf8" }) +
+			path ||
+			Config.get().cdn.endpointPrivate ||
+			"http://localhost:3001" + path,
 		{
 			headers: {
 				signature: Config.get().security.requestSignature,
@@ -75,7 +81,12 @@ export async function handleFile(
 
 export async function deleteFile(path: string) {
 	const response = await fetch(
-		`${Config.get().cdn.endpointPrivate || "http://localhost:3001"}${path}`,
+		fs.readFileSync("./tmp/PROT", { encoding: "utf8" }) +
+			"://" +
+			fs.readFileSync("./tmp/HOST", { encoding: "utf8" }) +
+			path ||
+			Config.get().cdn.endpointPrivate ||
+			"http://localhost:3001" + path,
 		{
 			headers: {
 				signature: Config.get().security.requestSignature,

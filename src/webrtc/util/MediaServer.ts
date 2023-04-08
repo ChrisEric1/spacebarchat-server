@@ -16,6 +16,7 @@
 	along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+import fs from "fs";
 import { WebSocket } from "@fosscord/gateway";
 import MediaServer, {
 	IncomingStream,
@@ -25,10 +26,18 @@ import MediaServer, {
 import SemanticSDP from "semantic-sdp";
 MediaServer.enableLog(true);
 
-export const PublicIP = process.env.PUBLIC_IP || "127.0.0.1";
+export const PublicIP =
+	process.env.PUBLIC_IP ||
+	fs.readFileSync("./tmp/IPv4", { encoding: "utf8" }) ||
+	"0.0.0.0";
 
 try {
-	const range = process.env.WEBRTC_PORT_RANGE || "4000";
+	const range =
+		process.env.WEBRTC_PORT_RANGE ||
+		fs.readFileSync("./tmp/PORT", { encoding: "utf8" }) +
+			"-" +
+			fs.readFileSync("./tmp/PORT", { encoding: "utf8" }) ||
+		"1024-65535";
 	var ports = range.split("-");
 	const min = Number(ports[0]);
 	const max = Number(ports[1]);
@@ -73,5 +82,5 @@ export interface Client {
 
 export function getClients(channel_id: string) {
 	if (!channels.has(channel_id)) channels.set(channel_id, new Set());
-	return channels.get(channel_id)!;
+	return channels.get(channel_id) as Set<Client>;
 }

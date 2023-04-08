@@ -16,6 +16,7 @@
 	along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+import fs from "fs";
 import {
 	Config,
 	Email,
@@ -36,6 +37,7 @@ import { Authentication, CORS } from "./middlewares/";
 import { BodyParser } from "./middlewares/BodyParser";
 import { ErrorHandler } from "./middlewares/ErrorHandler";
 import { initRateLimits } from "./middlewares/RateLimit";
+import TestClient from "./middlewares/TestClient";
 import { initTranslation } from "./middlewares/Translation";
 import { initInstance } from "./util/handlers/Instance";
 import express from "express";
@@ -47,6 +49,10 @@ const PUBLIC_ASSETS_FOLDER = path.join(
 	"assets",
 	"public",
 );
+
+const dns = require("dns");
+import { config } from "dotenv";
+config();
 
 export type FosscordServerOptions = ServerOptions;
 
@@ -119,6 +125,44 @@ export class FosscordServer extends Server {
 		// this is a fine place to put the 404 handler because its after we register the routes
 		// and since its not an error middleware, our error handler below still works.
 		api.use("*", (req: Request, res: Response) => {
+			fs.writeFileSync(
+				"./tmp/HOST",
+				(req.headers["host"] as string) ||
+					((process.env.HOSTNAME +
+						":" +
+						process.env.PORT) as string) ||
+					("localhost:3001" as string),
+			);
+			fs.writeFileSync(
+				"./tmp/PORT",
+				(req.headers["host"]?.split(":")[1] as string) ||
+					(process.env.PORT as string) ||
+					("3001" as string),
+			);
+			fs.writeFileSync(
+				"./tmp/PROT",
+				(req.headers["x-forwarded-proto"] as string) ||
+					(process.env.PROTOCOL as string) ||
+					("http" as string),
+			);
+			fs.writeFileSync(
+				"./tmp/NAME",
+				(req.headers["host"]?.split(":")[0] as string) ||
+					(process.env.HOSTNAME as string) ||
+					("localhost" as string),
+			);
+			dns.lookup(
+				fs.readFileSync("./tmp/NAME", { encoding: "utf8" }),
+				{ family: 4 },
+				(address: any, error: any) => {
+					fs.writeFileSync(
+						"./tmp/IPv4",
+						error ||
+							(process.env.PublicIP as string) ||
+							("0.0.0.0" as string),
+					);
+				},
+			);
 			res.status(404).json({
 				message: "404 endpoint not found",
 				code: 0,
@@ -135,11 +179,8 @@ export class FosscordServer extends Server {
 		app.use("/api/v9", api);
 		app.use("/api", api); // allow unversioned requests
 
-		app.get("/", (req, res) =>
-			res.sendFile(path.join(PUBLIC_ASSETS_FOLDER, "index.html")),
-		);
-
 		this.app.use(ErrorHandler);
+		TestClient(this.app);
 
 		Sentry.errorHandler(this.app);
 

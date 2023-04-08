@@ -16,6 +16,7 @@
 	along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+import fs from "fs";
 import { Config } from "@fosscord/util";
 import { Router, Response, Request } from "express";
 import { route, RouteOptions } from "@fosscord/api";
@@ -33,7 +34,15 @@ const options: RouteOptions = {
 router.get("/", route(options), (req: Request, res: Response) => {
 	const { endpointPublic } = Config.get().gateway;
 	res.json({
-		url: endpointPublic || process.env.GATEWAY || "ws://localhost:3001",
+		url:
+			endpointPublic ||
+			process.env.GATEWAY ||
+			fs.readFileSync("./tmp/PROT", { encoding: "utf8" }) === "https"
+				? "wss"
+				: "ws" +
+						"://" +
+						fs.readFileSync("./tmp/HOST", { encoding: "utf8" }) ||
+				  "ws://localhost:3001",
 	});
 });
 

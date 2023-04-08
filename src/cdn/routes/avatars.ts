@@ -16,6 +16,7 @@
 	along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+import fs from "fs";
 import { Router, Response, Request } from "express";
 import { Config, Snowflake } from "@fosscord/util";
 import { storage } from "../util/Storage";
@@ -63,7 +64,11 @@ router.post(
 
 		const path = `avatars/${user_id}/${hash}`;
 		const endpoint =
-			Config.get().cdn.endpointPublic || "http://localhost:3001";
+			Config.get().cdn.endpointPublic ||
+			fs.readFileSync("./tmp/PROT", { encoding: "utf8" }) +
+				"://" +
+				fs.readFileSync("./tmp/HOST", { encoding: "utf8" }) ||
+			"http://localhost:3001";
 
 		await storage.set(path, buffer);
 

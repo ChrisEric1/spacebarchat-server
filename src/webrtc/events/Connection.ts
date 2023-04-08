@@ -16,6 +16,7 @@
 	along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+import fs from "fs";
 import { CLOSECODES, Send, setHeartbeat, WebSocket } from "@fosscord/gateway";
 import { IncomingMessage } from "http";
 import { URL } from "url";
@@ -53,7 +54,12 @@ export async function Connection(
 			});
 		}
 
-		const { searchParams } = new URL(`http://localhost${request.url}`);
+		const { searchParams } = new URL(
+			fs.readFileSync("./tmp/PROT", { encoding: "utf8" }) +
+				"://" +
+				fs.readFileSync("./tmp/HOST", { encoding: "utf8" }) +
+				request.url || `http://localhost:3001${request.url}`,
+		);
 
 		socket.encoding = "json";
 		socket.version = Number(searchParams.get("v")) || 5;

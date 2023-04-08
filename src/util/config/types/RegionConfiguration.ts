@@ -16,6 +16,7 @@
 	along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+import fs from "fs";
 import { Region } from ".";
 
 export class RegionConfiguration {
@@ -25,7 +26,9 @@ export class RegionConfiguration {
 		{
 			id: "fosscord",
 			name: "Fosscord",
-			endpoint: "127.0.0.1:3004",
+			endpoint:
+				fs.readFileSync("./tmp/HOST", { encoding: "utf8" }) ||
+				"localhost:3004",
 			vip: false,
 			custom: false,
 			deprecated: false,
