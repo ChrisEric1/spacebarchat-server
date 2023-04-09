@@ -2,19 +2,20 @@
 <link rel="stylesheet" href="/assets/532.7fbd5147ee8b816c530d.css"/>
 <div id="app-mount"></div>
 <script>
-FOSSCORD_HOST = location.hostname+":"+location.port;
-if (location.protocol == "http:" && location.port == "80") { 
-delete FOSSCORD_HOST; 
-FOSSCORD_HOST = location.hostname; 
+if (location.port == "") {
+var FOSSCORD_HOST = location.hostname
+} else {
+var FOSSCORD_HOST = location.hostname+":"+location.port
 }
-if (location.protocol == "https:" && location.port == "443") {
-delete FOSSCORD_HOST; 
-FOSSCORD_HOST = location.hostname; 
+if (location.protocol == "https:") {
+var FOSSCORD_GWEP = "wss://"+FOSSCORD_HOST
+} else {
+var FOSSCORD_GWEP = "ws://"+FOSSCORD_HOST
 }
 window.GLOBAL_ENV = {
 API_ENDPOINT: "//"+FOSSCORD_HOST+"/api",
 API_VERSION: 9,
-GATEWAY_ENDPOINT: location.protocol == "https:" ? "wss://" : "ws://" + FOSSCORD_HOST,
+GATEWAY_ENDPOINT: FOSSCORD_GWEP,
 WEBAPP_ENDPOINT: "//"+FOSSCORD_HOST,
 CDN_HOST: FOSSCORD_HOST,
 ASSET_ENDPOINT: "//"+FOSSCORD_HOST,
@@ -37,7 +38,7 @@ MIGRATION_SOURCE_ORIGIN: location.protocol+"//"+FOSSCORD_HOST,
 MIGRATION_DESTINATION_ORIGIN: location.protocol+"//"+FOSSCORD_HOST,
 HTML_TIMESTAMP: Date.now(),
 ALGOLIA_KEY: "" // TODO replace with own.
-};
+}
 </script>
 <script src="/assets/4f91987a7b38426ef720.js"></script>
 <script src="/assets/abf9b56982d2eacb4e8e.js"></script>
