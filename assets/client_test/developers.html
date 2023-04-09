@@ -3,14 +3,14 @@
 <div id="app-mount"/>
 <script>
 if (location.port == "") {
-var FOSSCORD_HOST = location.hostname
+FOSSCORD_HOST = location.hostname
 } else {
-var FOSSCORD_HOST = location.hostname+":"+location.port
+FOSSCORD_HOST = location.hostname+":"+location.port
 }
 if (location.protocol == "https:") {
-var FOSSCORD_GWEP = "wss://"+FOSSCORD_HOST
+FOSSCORD_GWEP = "wss://"+FOSSCORD_HOST
 } else {
-var FOSSCORD_GWEP = "ws://"+FOSSCORD_HOST
+FOSSCORD_GWEP = "ws://"+FOSSCORD_HOST
 }
 window.GLOBAL_ENV = {
 API_ENDPOINT: "//"+FOSSCORD_HOST+"/api",
