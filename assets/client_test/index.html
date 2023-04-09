@@ -6,14 +6,14 @@ if (location.protocol == "http:" && location.port == "80") {
 delete FOSSCORD_HOST; 
 FOSSCORD_HOST = location.hostname; 
 }
-if (location.protocol === "https:" && location.port === "443") {
+if (location.protocol == "https:" && location.port == "443") {
 delete FOSSCORD_HOST; 
 FOSSCORD_HOST = location.hostname; 
 }
 window.GLOBAL_ENV = {
 API_ENDPOINT: "//"+FOSSCORD_HOST+"/api",
 API_VERSION: 9,
-GATEWAY_ENDPOINT: location.protocol === "https:" ? "wss://" : "ws://" + FOSSCORD_HOST,
+GATEWAY_ENDPOINT: location.protocol == "https:" ? "wss://" : "ws://" + FOSSCORD_HOST,
 WEBAPP_ENDPOINT: "//"+FOSSCORD_HOST,
 CDN_HOST: FOSSCORD_HOST,
 ASSET_ENDPOINT: "//"+FOSSCORD_HOST,

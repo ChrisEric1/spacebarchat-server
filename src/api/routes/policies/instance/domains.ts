@@ -36,7 +36,7 @@ router.get("/", route({}), async (req: Request, res: Response) => {
 		gateway:
 			gateway.endpointPublic ||
 			process.env.GATEWAY ||
-			fs.readFileSync("./tmp/PROT", { encoding: "utf8" }) === "https"
+			fs.readFileSync("./tmp/PROT", { encoding: "utf8" }) == "https"
 				? "wss"
 				: "ws" +
 						"://" +
