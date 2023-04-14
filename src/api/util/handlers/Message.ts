@@ -224,7 +224,6 @@ export async function postHandleMessage(message: Message) {
 
 		// bit gross, but whatever!
 		const endpointPublic =
-			Config.get().cdn.endpointPublic ||
 			fs.readFileSync("./tmp/PROT", { encoding: "utf8" }) +
 				"://" +
 				fs.readFileSync("./tmp/HOST", { encoding: "utf8" }) ||

@@ -35,14 +35,13 @@ router.get("/", route(options), (req: Request, res: Response) => {
 	const { endpointPublic } = Config.get().gateway;
 	res.json({
 		url:
-			endpointPublic ||
 			process.env.GATEWAY ||
-			fs.readFileSync("./tmp/PROT", { encoding: "utf8" }) == "https"
+			(fs.readFileSync("./tmp/PROT", { encoding: "utf8" }) == "https"
 				? "wss"
 				: "ws" +
-						"://" +
-						fs.readFileSync("./tmp/HOST", { encoding: "utf8" }) ||
-				  "ws://localhost:3001",
+				  "://" +
+				  fs.readFileSync("./tmp/HOST", { encoding: "utf8" })) ||
+			"ws://localhost:3001",
 	});
 });
 

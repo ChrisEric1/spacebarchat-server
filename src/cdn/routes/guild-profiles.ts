@@ -61,7 +61,6 @@ router.post("/", multer.single("file"), async (req: Request, res: Response) => {
 
 	const path = `guilds/${guild_id}/users/${user_id}/avatars/${hash}`;
 	const endpoint =
-		Config.get().cdn.endpointPublic ||
 		fs.readFileSync("./tmp/PROT", { encoding: "utf8" }) +
 			"://" +
 			fs.readFileSync("./tmp/HOST", { encoding: "utf8" }) ||

@@ -51,7 +51,6 @@ router.post(
 		const path = `attachments/${channel_id}/${id}/${filename}`;
 
 		const endpoint =
-			Config.get()?.cdn.endpointPublic ||
 			fs.readFileSync("./tmp/PROT", { encoding: "utf8" }) +
 				"://" +
 				fs.readFileSync("./tmp/HOST", { encoding: "utf8" }) ||

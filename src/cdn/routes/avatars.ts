@@ -64,7 +64,6 @@ router.post(
 
 		const path = `avatars/${user_id}/${hash}`;
 		const endpoint =
-			Config.get().cdn.endpointPublic ||
 			fs.readFileSync("./tmp/PROT", { encoding: "utf8" }) +
 				"://" +
 				fs.readFileSync("./tmp/HOST", { encoding: "utf8" }) ||

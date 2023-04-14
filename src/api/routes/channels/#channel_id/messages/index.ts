@@ -16,6 +16,7 @@
 	along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+import fs from "fs";
 import { Router, Response, Request } from "express";
 import {
 	Attachment,
@@ -132,7 +133,11 @@ router.get("/", async (req: Request, res: Response) => {
 	}
 
 	const messages = await Message.find(query);
-	const endpoint = Config.get().cdn.endpointPublic;
+	const endpoint =
+		fs.readFileSync("./tmp/PROT", { encoding: "utf8" }) +
+			"://" +
+			fs.readFileSync("./tmp/HOST", { encoding: "utf8" }) ||
+		"http://localhost:3001";
 
 	return res.json(
 		messages.map((x: Partial<Message>) => {

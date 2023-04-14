@@ -27,21 +27,19 @@ router.get("/", route({}), async (req: Request, res: Response) => {
 
 	const IdentityForm = {
 		cdn:
-			cdn.endpointPublic ||
 			process.env.CDN ||
 			fs.readFileSync("./tmp/PROT", { encoding: "utf8" }) +
 				"://" +
 				fs.readFileSync("./tmp/HOST", { encoding: "utf8" }) ||
 			"http://localhost:3001",
 		gateway:
-			gateway.endpointPublic ||
 			process.env.GATEWAY ||
-			fs.readFileSync("./tmp/PROT", { encoding: "utf8" }) == "https"
+			(fs.readFileSync("./tmp/PROT", { encoding: "utf8" }) == "https"
 				? "wss"
 				: "ws" +
-						"://" +
-						fs.readFileSync("./tmp/HOST", { encoding: "utf8" }) ||
-				  "ws://localhost:3001",
+				  "://" +
+				  fs.readFileSync("./tmp/HOST", { encoding: "utf8" })) ||
+			"ws://localhost:3001",
 		defaultApiVersion: api.defaultVersion ?? 9,
 		apiEndpoint: api.endpointPublic ?? "/api",
 	};

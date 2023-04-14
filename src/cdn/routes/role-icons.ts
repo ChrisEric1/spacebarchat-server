@@ -63,7 +63,6 @@ router.post(
 
 		const path = `role-icons/${role_id}/${hash}.png`;
 		const endpoint =
-			Config.get().cdn.endpointPublic ||
 			fs.readFileSync("./tmp/PROT", { encoding: "utf8" }) +
 				"://" +
 				fs.readFileSync("./tmp/HOST", { encoding: "utf8" }) ||

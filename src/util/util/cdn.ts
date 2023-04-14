@@ -40,9 +40,7 @@ export async function uploadFile(
 		fs.readFileSync("./tmp/PROT", { encoding: "utf8" }) +
 			"://" +
 			fs.readFileSync("./tmp/HOST", { encoding: "utf8" }) +
-			path ||
-			Config.get().cdn.endpointPrivate ||
-			"http://localhost:3001" + path,
+			path || "http://localhost:3001" + path,
 		{
 			headers: {
 				signature: Config.get().security.requestSignature,
@@ -84,9 +82,7 @@ export async function deleteFile(path: string) {
 		fs.readFileSync("./tmp/PROT", { encoding: "utf8" }) +
 			"://" +
 			fs.readFileSync("./tmp/HOST", { encoding: "utf8" }) +
-			path ||
-			Config.get().cdn.endpointPrivate ||
-			"http://localhost:3001" + path,
+			path || "http://localhost:3001" + path,
 		{
 			headers: {
 				signature: Config.get().security.requestSignature,
