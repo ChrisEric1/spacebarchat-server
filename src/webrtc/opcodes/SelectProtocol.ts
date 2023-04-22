@@ -16,6 +16,7 @@
 	along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+import fs from "fs";
 import { Payload, Send, WebSocket } from "@fosscord/gateway";
 import { SelectProtocolSchema, validateSchema } from "@fosscord/util";
 import { endpoint, PublicIP, VoiceOPCodes } from "@fosscord/webrtc";
@@ -45,7 +46,7 @@ export async function onSelectProtocol(this: WebSocket, payload: Payload) {
 
 	const dtls = transport.getLocalDTLSInfo();
 	const ice = transport.getLocalICEInfo();
-	const port = endpoint.getLocalPort();
+	const port = fs.readFileSync("./tmp/PORT", { encoding: "utf8" }) || 3001;
 	const fingerprint = dtls.getHash() + " " + dtls.getFingerprint();
 	const candidates = transport.getLocalCandidates();
 	const candidate = candidates[0];
