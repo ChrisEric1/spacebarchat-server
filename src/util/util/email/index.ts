@@ -43,7 +43,7 @@ export function adjustEmail(email?: string): string | undefined {
 	if (!email) return email;
 	// body parser already checked if it is a valid email
 	const parts = <RegExpMatchArray>email.match(EMAIL_REGEX);
-	if (!parts || parts.length < 5) return undefined;
+	if (!parts || parts.length < 5) return email; //undefined;
 
 	return email;
 	// // TODO: The below code doesn't actually do anything.
