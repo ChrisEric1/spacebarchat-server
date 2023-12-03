@@ -94,7 +94,6 @@ export class FosscordServer extends Server {
 			} else if ((req.header("referer") as string) != undefined) {
 				place = req.header("referer") as string;
 			}
-			console.log(place);
 			fs.writeFileSync(
 				"./tmp/PROT",
 				place.split(":")[0] || process.env.PROTOCOL || "http",
