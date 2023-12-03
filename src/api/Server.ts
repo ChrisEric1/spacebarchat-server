@@ -83,37 +83,8 @@ export class FosscordServer extends Server {
 		await Sentry.init(this.app);
 		WebAuthn.init();
 
-		const logRequests = process.env["LOG_REQUESTS"] != undefined;
-		if (logRequests) {
-			this.app.use(
-				morgan("combined", {
-					skip: (req, res) => {
-						let skip = !(
-							process.env["LOG_REQUESTS"]?.includes(
-								res.statusCode.toString(),
-							) ?? false
-						);
-						if (process.env["LOG_REQUESTS"]?.charAt(0) == "-")
-							skip = !skip;
-						return skip;
-					},
-				}),
-			);
-		}
-
-		this.app.set("json replacer", JSONReplacer);
-
-		this.app.use(CORS);
-		this.app.use(BodyParser({ inflate: true, limit: "10mb" }));
-
-		const app = this.app;
-		const api = Router();
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-		this.app = api;
-
-		app.all("*", (req: Request, res: Response, next) => {
-			let place = "";
+		let place = "";
+		this.app.use("*", (req: Request, res: Response, next) => {
 			if ((req.header("Referer") as string) != undefined) {
 				place = req.header("Referer") as string;
 			} else if ((req.header("Origin") as string) != undefined) {
@@ -122,9 +93,8 @@ export class FosscordServer extends Server {
 				place = req.header("origin") as string;
 			} else if ((req.header("referer") as string) != undefined) {
 				place = req.header("referer") as string;
-			} else {
-				place = "";
 			}
+			console.log(place);
 			fs.writeFileSync(
 				"./tmp/PROT",
 				place.split(":")[0] || process.env.PROTOCOL || "http",
@@ -214,6 +184,35 @@ export class FosscordServer extends Server {
 			);
 			next();
 		});
+
+		const logRequests = process.env["LOG_REQUESTS"] != undefined;
+		if (logRequests) {
+			this.app.use(
+				morgan("combined", {
+					skip: (req, res) => {
+						let skip = !(
+							process.env["LOG_REQUESTS"]?.includes(
+								res.statusCode.toString(),
+							) ?? false
+						);
+						if (process.env["LOG_REQUESTS"]?.charAt(0) == "-")
+							skip = !skip;
+						return skip;
+					},
+				}),
+			);
+		}
+
+		this.app.set("json replacer", JSONReplacer);
+
+		this.app.use(CORS);
+		this.app.use(BodyParser({ inflate: true, limit: "10mb" }));
+
+		const app = this.app;
+		const api = Router();
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		this.app = api;
 
 		api.use(Authentication);
 		await initRateLimits(api);

@@ -21,7 +21,14 @@ import { Router, Request, Response } from "express";
 import { route } from "@fosscord/api";
 import { Config } from "@fosscord/util";
 const router = Router();
-
+let websock = "";
+if (fs.readFileSync("./tmp/PROT", { encoding: "utf8" }) == "https") {
+	websock = "wss://" + fs.readFileSync("./tmp/HOST", { encoding: "utf8" });
+} else if (fs.readFileSync("./tmp/PROT", { encoding: "utf8" }) == "http") {
+	websock = "ws://" + fs.readFileSync("./tmp/HOST", { encoding: "utf8" });
+} else {
+	websock = "";
+}
 router.get("/", route({}), async (req: Request, res: Response) => {
 	const { cdn, gateway, api } = Config.get();
 
@@ -32,14 +39,7 @@ router.get("/", route({}), async (req: Request, res: Response) => {
 				"://" +
 				fs.readFileSync("./tmp/HOST", { encoding: "utf8" }) ||
 			"http://localhost:3001",
-		gateway:
-			process.env.GATEWAY ||
-			(fs.readFileSync("./tmp/PROT", { encoding: "utf8" }) == "https"
-				? "wss"
-				: "ws" +
-				  "://" +
-				  fs.readFileSync("./tmp/HOST", { encoding: "utf8" })) ||
-			"ws://localhost:3001",
+		gateway: websock || process.env.GATEWAY || "ws://localhost:3001",
 		defaultApiVersion: api.defaultVersion ?? 9,
 		apiEndpoint: api.endpointPublic ?? "/api",
 	};

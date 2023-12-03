@@ -30,18 +30,18 @@ const options: RouteOptions = {
 		},
 	},
 };
-
+let websock = "";
+if (fs.readFileSync("./tmp/PROT", { encoding: "utf8" }) == "https") {
+	websock = "wss://" + fs.readFileSync("./tmp/HOST", { encoding: "utf8" });
+} else if (fs.readFileSync("./tmp/PROT", { encoding: "utf8" }) == "http") {
+	websock = "ws://" + fs.readFileSync("./tmp/HOST", { encoding: "utf8" });
+} else {
+	websock = "";
+}
 router.get("/", route(options), (req: Request, res: Response) => {
 	const { endpointPublic } = Config.get().gateway;
 	res.json({
-		url:
-			process.env.GATEWAY ||
-			(fs.readFileSync("./tmp/PROT", { encoding: "utf8" }) == "https"
-				? "wss"
-				: "ws" +
-				  "://" +
-				  fs.readFileSync("./tmp/HOST", { encoding: "utf8" })) ||
-			"ws://localhost:3001",
+		url: websock || process.env.GATEWAY || "ws://localhost:3001",
 		shards: 1,
 		session_start_limit: {
 			total: 1000,
