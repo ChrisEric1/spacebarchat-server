@@ -112,6 +112,109 @@ export class FosscordServer extends Server {
 		// @ts-ignore
 		this.app = api;
 
+		app.all("*", (req: Request, res: Response, next) => {
+			let place = "";
+			if ((req.header("Referer") as string) != undefined) {
+				place = req.header("Referer") as string;
+			} else if ((req.header("Origin") as string) != undefined) {
+				place = req.header("Origin") as string;
+			} else if ((req.header("origin") as string) != undefined) {
+				place = req.header("origin") as string;
+			} else if ((req.header("referer") as string) != undefined) {
+				place = req.header("referer") as string;
+			} else {
+				place = "";
+			}
+			fs.writeFileSync(
+				"./tmp/PROT",
+				place.split(":")[0] || process.env.PROTOCOL || "http",
+			);
+			if (
+				fs.readFileSync("./tmp/PROT", { encoding: "utf8" }) ==
+					"https" &&
+				place.split("://")[1]?.split(":")[1]?.split("/")[0] == undefined
+			) {
+				fs.writeFileSync(
+					"./tmp/HOST",
+					place.split("://")[1]?.split(":")[0]?.split("/")[0] +
+						":" +
+						"443" ||
+						process.env.HOSTNAME + ":" + process.env.PORT ||
+						"localhost:3001",
+				);
+				fs.writeFileSync(
+					"./tmp/PORT",
+					"443" || process.env.PORT || "3001",
+				);
+				fs.writeFileSync(
+					"./tmp/NAME",
+					place.split("://")[1]?.split(":")[0]?.split("/")[0] ||
+						process.env.HOSTNAME ||
+						"localhost",
+				);
+			} else if (
+				fs.readFileSync("./tmp/PROT", { encoding: "utf8" }) == "http" &&
+				place.split("://")[1]?.split(":")[1]?.split("/")[0] == undefined
+			) {
+				fs.writeFileSync(
+					"./tmp/HOST",
+					place.split("://")[1]?.split(":")[0]?.split("/")[0] +
+						":" +
+						"80" ||
+						process.env.HOSTNAME +
+							":" +
+							process.env.PORT +
+							"/spacebar" ||
+						"localhost:3001" + "/spacebar",
+				);
+				fs.writeFileSync(
+					"./tmp/PORT",
+					"80" || process.env.PORT || "3001",
+				);
+				fs.writeFileSync(
+					"./tmp/NAME",
+					place.split("://")[1]?.split(":")[0]?.split("/")[0] ||
+						process.env.HOSTNAME ||
+						"localhost",
+				);
+			} else {
+				fs.writeFileSync(
+					"./tmp/HOST",
+					place.split("://")[1]?.split(":")[0]?.split("/")[0] +
+						":" +
+						place.split("://")[1]?.split(":")[1]?.split("/")[0] ||
+						process.env.HOSTNAME +
+							":" +
+							process.env.PORT +
+							"/spacebar" ||
+						"localhost:3001" + "/spacebar",
+				);
+				fs.writeFileSync(
+					"./tmp/PORT",
+					place.split("://")[1]?.split(":")[1]?.split("/")[0] ||
+						process.env.PORT ||
+						"3001",
+				);
+				fs.writeFileSync(
+					"./tmp/NAME",
+					place.split("://")[1]?.split(":")[0]?.split("/")[0] ||
+						process.env.HOSTNAME ||
+						"localhost",
+				);
+			}
+			dns.lookup(
+				fs.readFileSync("./tmp/NAME", { encoding: "utf8" }),
+				{ family: 4 },
+				(address: any, error: any) => {
+					fs.writeFileSync(
+						"./tmp/IPv4",
+						error || process.env.PublicIP || "0.0.0.0",
+					);
+				},
+			);
+			next();
+		});
+
 		api.use(Authentication);
 		await initRateLimits(api);
 		await initTranslation(api);
@@ -125,44 +228,6 @@ export class FosscordServer extends Server {
 		// this is a fine place to put the 404 handler because its after we register the routes
 		// and since its not an error middleware, our error handler below still works.
 		api.use("*", (req: Request, res: Response) => {
-			fs.writeFileSync(
-				"./tmp/HOST",
-				(req.headers["host"] as string) ||
-					((process.env.HOSTNAME +
-						":" +
-						process.env.PORT) as string) ||
-					("localhost:3001" as string),
-			);
-			fs.writeFileSync(
-				"./tmp/PORT",
-				(req.headers["host"]?.split(":")[1] as string) ||
-					(process.env.PORT as string) ||
-					("3001" as string),
-			);
-			fs.writeFileSync(
-				"./tmp/PROT",
-				(req.headers["x-forwarded-proto"] as string) ||
-					(process.env.PROTOCOL as string) ||
-					("http" as string),
-			);
-			fs.writeFileSync(
-				"./tmp/NAME",
-				(req.headers["host"]?.split(":")[0] as string) ||
-					(process.env.HOSTNAME as string) ||
-					("localhost" as string),
-			);
-			dns.lookup(
-				fs.readFileSync("./tmp/NAME", { encoding: "utf8" }),
-				{ family: 4 },
-				(address: any, error: any) => {
-					fs.writeFileSync(
-						"./tmp/IPv4",
-						error ||
-							(process.env.PublicIP as string) ||
-							("0.0.0.0" as string),
-					);
-				},
-			);
 			res.status(404).json({
 				message: "404 endpoint not found",
 				code: 0,

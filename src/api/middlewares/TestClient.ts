@@ -74,7 +74,7 @@ export default function TestClient(app: Application) {
 		const cache = assetCache.get(req.params.file);
 		if (!cache) {
 			response = await fetch(
-				`https://discord.com/assets/${req.params.file}`,
+				`http://localhost:96/assets/${req.params.file}`,
 				{
 					agent,
 					headers: { ...(req.headers as { [key: string]: string }) },
